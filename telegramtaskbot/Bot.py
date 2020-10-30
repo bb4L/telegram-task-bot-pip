@@ -9,16 +9,19 @@ from telegram import InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import CallbackQueryHandler, CommandHandler, Filters, Updater
 
 from telegramtaskbot.Tasks.UrlTask import UrlTask
+from telegramtaskbot.Tasks.Task import Task
 
 
 class TelegramTaskBot(object):
+    """A bot that can handle implementations of the different tasks."""
+
     jobs: List[telegram.ext.Job] = []
     default_button_list: List[InlineKeyboardButton] = []
     cmd_fun = {}
     job_names = {}
     logger = logging.getLogger(__name__)
 
-    def __init__(self, tasks: []) -> None:
+    def __init__(self, tasks: List[Task]) -> None:
         load_dotenv()
         self.updater = Updater(token=os.getenv('BOT_TOKEN'), use_context=True)
         self.dispatcher = self.updater.dispatcher

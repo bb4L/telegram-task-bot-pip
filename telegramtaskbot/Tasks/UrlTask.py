@@ -11,6 +11,8 @@ from telegramtaskbot.Tasks.GenericTask import GenericTask
 
 
 class UrlTask(GenericTask):
+    """A task based on a http request."""
+
     disable_notifications = True
     url: str
     job_name: str

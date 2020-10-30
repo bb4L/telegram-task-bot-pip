@@ -10,6 +10,8 @@ from telegram.ext import JobQueue
 
 
 class Task(object):
+    """A repeating task."""
+
     job_name: str
     job_start_name: str
     job_stop_name: str

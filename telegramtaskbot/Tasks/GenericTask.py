@@ -8,6 +8,8 @@ from telegramtaskbot.Tasks.Task import Task
 
 
 class GenericTask(Task):
+    """Basic task users can subscribe to."""
+
     job_actual_value: str
     job_name: str
     generic = True
