@@ -1,21 +1,21 @@
 import time as timer
 from abc import abstractmethod
+from typing import List
 
 import requests
 import telegram
-from telegram.ext import JobQueue
-
 from requests import Response
 from telegram import InlineKeyboardButton
-
+from telegram.ext import JobQueue
 from telegramtaskbot.Tasks.GenericTask import GenericTask
 
 
 class UrlTask(GenericTask):
     disable_notifications = True
     url: str
+    job_name: str
 
-    def callback(self, context: telegram.ext.CallbackContext):
+    def callback(self, context: telegram.ext.CallbackContext) -> None:
         self.logger.info(f'Run {self.job_name}')
         users = self.load_users()
         response_message = self.get_data()
@@ -29,26 +29,29 @@ class UrlTask(GenericTask):
                 self.logger.info(f'Error occurred while notifying {user}')
                 self.logger.error(e.message)
 
-    def get_actual_value(self, joblist: [], update: telegram.Update, context: telegram.ext.CallbackContext):
-        self.handle_get_actual_value(context, update.callback_query.message.chat_id)
+    def get_actual_value(self, joblist: [], update: telegram.Update, context: telegram.ext.CallbackContext) -> None:
+        self.handle_get_actual_value(
+            context, update.callback_query.message.chat_id)
 
-    def get_actual_value_cmd(self, update: telegram.Update, context: telegram.ext.CallbackContext):
+    def get_actual_value_cmd(self, update: telegram.Update, context: telegram.ext.CallbackContext) -> None:
         self.handle_get_actual_value(context, update.message.chat_id)
 
-    def handle_get_actual_value(self, context: telegram.ext.CallbackContext, chat_id: str):
-        self.logger.debug(f'Get actual value from {self.job_name} for {chat_id}')
-        data: str = self.get_data()
-        self.logger.debug(f'Send message to {chat_id} with content: \"{" ".join(data.splitlines())}\"')
+    def handle_get_actual_value(self, context: telegram.ext.CallbackContext, chat_id: str) -> None:
+        self.logger.debug(
+            f'Get actual value from {self.job_name} for {chat_id}')
+        data = self.get_data()
+        self.logger.debug(
+            f'Send message to {chat_id} with content: \"{" ".join(data.splitlines())}\"')
         context.bot.send_message(chat_id=chat_id, text=data)
 
-    def get_data(self):
+    def get_data(self) -> str:
         return self.handle_response(self.get_response())
 
     @abstractmethod
-    def handle_response(self, response: Response):
+    def handle_response(self, response: Response) -> str:
         pass
 
-    def get_response(self):
+    def get_response(self) -> Response:
         count = 0
         response = requests.get(self.url)
         if response.status_code != 200:
@@ -60,11 +63,14 @@ class UrlTask(GenericTask):
         self.logger.debug(f'{self.job_name} tried for {count} times')
         return response
 
-    def get_inline_keyboard(self):
+    def get_inline_keyboard(self) -> List[InlineKeyboardButton]:
         buttons = [
-            InlineKeyboardButton(f"Get actual Value for {self.job_name}", callback_data=self.job_actual_value),
+            InlineKeyboardButton(
+                f"Get actual Value for {self.job_name}", callback_data=self.job_actual_value),
         ]
         if self.show_subscribe_buttons:
-            buttons.append(InlineKeyboardButton(f"Subscribe for {self.job_name}", callback_data=self.job_start_name))
-            buttons.append(InlineKeyboardButton(f"Unsubscribe for {self.job_name}", callback_data=self.job_stop_name))
+            buttons.append(InlineKeyboardButton(
+                f"Subscribe for {self.job_name}", callback_data=self.job_start_name))
+            buttons.append(InlineKeyboardButton(
+                f"Unsubscribe for {self.job_name}", callback_data=self.job_stop_name))
         return buttons
