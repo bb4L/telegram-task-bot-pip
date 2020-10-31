@@ -57,19 +57,19 @@ class GenericTask(Task):
     def __init__(self, job_queue: JobQueue = None) -> None:
         super().__init__()
         self.job_actual_value = 'actual_' + self.job_name
-        self._start([], job_queue, self.job_name)
+        self._handle_start([], job_queue, self.job_name)
 
     @abstractmethod
     def callback(self, context: telegram.ext.CallbackContext) -> None:
         pass
 
     def start(self, jobs: List[telegram.ext.Job], update: telegram.Update, context: telegram.ext.CallbackContext) -> None:
-        self._start(context, update.callback_query.message.chat_id)
+        self._handle_start(context, update.callback_query.message.chat_id)
 
     def start_command(self, update: telegram.Update, context: telegram.ext.CallbackContext) -> None:
-        self._start(context, update.message.chat_id)
+        self._handle_start(context, update.message.chat_id)
 
-    def _start(self, context: telegram.ext.CallbackContext, chat_id: str, with_message: bool = True) -> None:
+    def _handle_start(self, context: telegram.ext.CallbackContext, chat_id: str, with_message: bool = True) -> None:
         if with_message:
             context.bot.send_message(chat_id=chat_id,
                                      text=f'Thank you for subscribing')
@@ -77,12 +77,12 @@ class GenericTask(Task):
         self.logger.debug(f'User {chat_id} subscribed')
 
     def stop(self, jobs: List[telegram.ext.Job], update: telegram.Update, context: telegram.ext.CallbackContext) -> None:
-        self._stop(context, update.callback_query.message.chat_id)
+        self._handle_stop(context, update.callback_query.message.chat_id)
 
     def stop_command(self, update: telegram.Update, context: telegram.ext.CallbackContext) -> None:
-        self._stop(context, update.message.chat_id)
+        self._handle_stop(context, update.message.chat_id)
 
-    def _stop(self, context: telegram.ext.CallbackContext, chat_id: str, with_message: bool = True) -> None:
+    def _handle_stop(self, context: telegram.ext.CallbackContext, chat_id: str, with_message: bool = True) -> None:
         users = self.load_users()
         users.remove(chat_id)
         self._save_to_json(users)

@@ -77,7 +77,7 @@ class UrlTask(GenericTask):
             context, update.callback_query.message.chat_id)
 
     def get_actual_value_cmd(self, update: telegram.Update, context: telegram.ext.CallbackContext) -> None:
-        """"Handles command to get the actual value.""""
+        """Handles command to get the actual value."""
 
         self.handle_get_actual_value(context, update.message.chat_id)
 

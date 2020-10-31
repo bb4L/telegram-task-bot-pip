@@ -32,10 +32,10 @@ class Task(object):
         defines if the task looks the same for each user
 
     first_time : int
-        when the first run of the job should be
+        when the first run of the task should be
 
     repeat_time : timedelta
-        the time until the job is rerun
+        the time until the task is rerun
 
     filename : str
         name for the filename for the to store information/subscribed users

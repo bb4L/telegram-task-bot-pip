@@ -13,12 +13,52 @@ from telegramtaskbot.Tasks.Task import Task
 
 
 class TelegramTaskBot(object):
-    """A bot that can handle implementations of the different tasks."""
+    """
+    A bot that can handle implementations of the different tasks.
+    
+    Attributes
+    ----------
+    jobs : List[telegram.ext.Job]
+        list of the jobs registered
+    
+    default_button_list : List[InlineKeyboardButton]
+        list of the default buttons
+    
+    cmd_fun : dict
+        dictionary to map a command to a function
+    
+    logger : Logger
+        the logger for the button
+
+    Methods
+    ----------
+    
+    get_default_filter() -> telegram.ext.Filters.user
+        returns a user filter
+
+    start(self, update, context) -> None
+        gives the buttons to start or get tasks
+
+    run(self) -> None
+
+
+    handle_button(self, update, context) -> None
+    
+    
+    load_from_json(self) -> None
+    
+    
+    save_to_json(self) -> None
+    
+    
+    build_menu(buttons, n_cols, header_buttons=None, footer_buttons=None) -> List[InlineKeyboardButton]
+
+
+    """
 
     jobs: List[telegram.ext.Job] = []
     default_button_list: List[InlineKeyboardButton] = []
     cmd_fun = {}
-    job_names = {}
     logger = logging.getLogger(__name__)
 
     def __init__(self, tasks: List[Task]) -> None:
