@@ -34,10 +34,14 @@ class Task(object):
 
     @abstractmethod
     def start_command(self, update: telegram.Update, context: telegram.ext.CallbackContext) -> None:
+        """Start the task."""
+
         pass
 
     @abstractmethod
     def stop_command(self, update: telegram.Update, context: telegram.ext.CallbackContext) -> None:
+        """Stop the task."""
+        
         pass
 
     def _start(self, jobs: List[telegram.ext.Job], job_queue: JobQueue, chat_id) -> None:
@@ -66,6 +70,8 @@ class Task(object):
             chat_id=context.job.context, text=f'Callback from {self.job_name}')
 
     def get_inline_keyboard(self) -> List[InlineKeyboardButton]:
+        """Returns a List[InlineKeyboardButton] containing all the relevant buttons."""
+
         return [InlineKeyboardButton(f"Start {self.job_name} task", callback_data=self.job_start_name),
                 InlineKeyboardButton(
                     f"Stop {self.job_name} task", callback_data=self.job_stop_name),

@@ -11,7 +11,35 @@ from telegramtaskbot.Tasks.GenericTask import GenericTask
 
 
 class UrlTask(GenericTask):
-    """A task based on a http request."""
+    """
+    A task based on a http request.
+
+    Attributes
+    ----------
+    disable_notifications : bool
+        wether notifications should be disabled or not
+
+    Methods
+    ----------
+    def callback(self, context: telegram.ext.CallbackContext) -> None:
+        Execute the task and use the context to send the message.
+
+    def get_actual_value(self, joblist: [], update: telegram.Update, context: telegram.ext.CallbackContext) -> None:
+        Returns the current value for the task.
+
+    # TODO: write docs
+    def get_actual_value_cmd(self, update: telegram.Update, context: telegram.ext.CallbackContext) -> None:
+
+    def handle_get_actual_value(self, context: telegram.ext.CallbackContext, chat_id: str) -> None:
+
+    def get_data(self) -> str:
+
+    def handle_response(self, response: Response) -> str:
+
+    def get_response(self) -> Response:
+
+    def get_inline_keyboard(self) -> List[InlineKeyboardButton]:
+    """
 
     disable_notifications = True
     url: str
@@ -51,6 +79,8 @@ class UrlTask(GenericTask):
 
     @abstractmethod
     def handle_response(self, response: Response) -> str:
+        """Handle the given response and return the actual message to be send."""
+
         pass
 
     def get_response(self) -> Response:
@@ -66,6 +96,8 @@ class UrlTask(GenericTask):
         return response
 
     def get_inline_keyboard(self) -> List[InlineKeyboardButton]:
+        """Returns a List[InlineKeyboardButton] containing all the relevant buttons."""
+
         buttons = [
             InlineKeyboardButton(
                 f"Get actual Value for {self.job_name}", callback_data=self.job_actual_value),
