@@ -8,31 +8,31 @@ from dotenv import load_dotenv
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import CallbackQueryHandler, CommandHandler, Filters, Updater
 
-from telegramtaskbot.Tasks.UrlTask import UrlTask
 from telegramtaskbot.Tasks.Task import Task
+from telegramtaskbot.Tasks.UrlTask import UrlTask
 
 
 class TelegramTaskBot(object):
     """
     A bot that can handle implementations of the different tasks.
-    
+
     Attributes
     ----------
     jobs : List[telegram.ext.Job]
         list of the jobs registered
-    
+
     default_button_list : List[InlineKeyboardButton]
         list of the default buttons
-    
+
     cmd_fun : dict
         dictionary to map a command to a function
-    
+
     logger : Logger
         the logger for the button
 
     Methods
     ----------
-    
+
     get_default_filter() -> telegram.ext.Filters.user
         returns a user filter
 
@@ -40,20 +40,10 @@ class TelegramTaskBot(object):
         gives the buttons to start or get tasks
 
     run(self) -> None
-
+        Start the bot
 
     handle_button(self, update, context) -> None
-    
-    
-    load_from_json(self) -> None
-    
-    
-    save_to_json(self) -> None
-    
-    
-    build_menu(buttons, n_cols, header_buttons=None, footer_buttons=None) -> List[InlineKeyboardButton]
-
-
+        Function to handle button clicks
     """
 
     jobs: List[telegram.ext.Job] = []
@@ -88,7 +78,7 @@ class TelegramTaskBot(object):
                 self.dispatcher.add_handler(CommandHandler(
                     task.job_stop_name, task.stop_command, default_filter))
 
-        self.load_from_json()
+        self._load_from_json()
 
     @staticmethod
     def get_default_filter() -> telegram.ext.Filters.user:
@@ -102,7 +92,7 @@ class TelegramTaskBot(object):
 
     def start(self, update, context) -> None:
         reply_markup = InlineKeyboardMarkup(
-            self.build_menu(self.default_button_list, n_cols=1))
+            self._build_menu(self.default_button_list, n_cols=1))
         context.bot.send_message(chat_id=update.effective_chat.id, text=os.getenv('START_MESSAGE'),
                                  reply_markup=reply_markup)
 
@@ -112,10 +102,10 @@ class TelegramTaskBot(object):
     def handle_button(self, update, context) -> None:
         query = update.callback_query
         self.cmd_fun.get(query.data)(self.jobs, update, context)
-        self.save_to_json()
+        self._save_to_json()
         self.logger.info('after save')
 
-    def load_from_json(self) -> None:
+    def _load_from_json(self) -> None:
         try:
             with open('saved_jobs.json') as json_file:
                 data = json.load(json_file)
@@ -128,7 +118,7 @@ class TelegramTaskBot(object):
         except IOError:
             self.logger.info("File not accessible")
 
-    def save_to_json(self) -> None:
+    def _save_to_json(self) -> None:
         data = {'jobs': []}
         for job in self.jobs:
             data['jobs'].append({
@@ -139,7 +129,7 @@ class TelegramTaskBot(object):
             json.dump(data, outfile)
 
     @staticmethod
-    def build_menu(buttons, n_cols, header_buttons=None, footer_buttons=None) -> List[InlineKeyboardButton]:
+    def _build_menu(buttons, n_cols, header_buttons=None, footer_buttons=None) -> List[InlineKeyboardButton]:
         menu = [buttons[i:i + n_cols] for i in range(0, len(buttons), n_cols)]
         if header_buttons:
             menu.insert(0, header_buttons)
