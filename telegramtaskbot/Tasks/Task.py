@@ -10,13 +10,65 @@ from telegram.ext import JobQueue
 
 
 class Task(object):
-    """A repeating task."""
+    """
+    A repeating task.
+
+    Attributes
+    ----------
+
+    job_name : str
+        the name of the task
+
+    job_start_name : str
+        the string identifier of the start command
+
+    job_stop_name : str
+        the string identifier of the stop command
+
+    disable_notifications : bool
+        bool if notifications should be disabled or not
+
+    generic : bool
+        defines if the task looks the same for each user
+
+    first_time : int
+        when the first run of the job should be
+
+    repeat_time : timedelta
+        the time until the job is rerun
+
+    filename : str
+        name for the filename for the to store information/subscribed users
+
+    logger : Logger
+        the logger for the task
+
+    Methods
+    ----------
+    callback(self, context: telegram.ext.CallbackContext) -> None
+        Send the message.
+
+    start(self, jobs: List[telegram.ext.Job], update: telegram.Update, context: telegram.ext.CallbackContext) -> None
+        Starts the task by button
+
+    start_command(self, update: telegram.Update, context: telegram.ext.CallbackContext) -> None
+        Starts the task by command
+
+    stop_command(self, update: telegram.Update, context: telegram.ext.CallbackContext) -> None
+        Stops the task by command
+
+    stop(self, jobs: List[telegram.ext.Job], update: telegram.Update, context: telegram.ext.CallbackContext) -> None
+        Stops the task by button
+
+    get_inline_keyboard(self) -> List[InlineKeyboardButton]
+        Returns the list of buttons to be shown
+    """
 
     job_name: str
     job_start_name: str
     job_stop_name: str
     disable_notifications: bool = True
-    generic: bool = False  # defines if the task looks the same for each user
+    generic: bool = False
     first_time = 0
     repeat_time: timedelta = timedelta(seconds=5)
     filename: str = ''
@@ -25,6 +77,11 @@ class Task(object):
     def __init__(self, job_queue: JobQueue = None) -> None:
         self.job_start_name = 'start_' + self.job_name
         self.job_stop_name = 'stop_' + self.job_name
+
+    @abstractmethod
+    def callback(self, context: telegram.ext.CallbackContext) -> None:
+        context.bot.send_message(
+            chat_id=context.job.context, text=f'Callback from {self.job_name}')
 
     def start(self, jobs: List[telegram.ext.Job], update: telegram.Update, context: telegram.ext.CallbackContext) -> None:
         context.bot.send_message(chat_id=update.callback_query.message.chat_id,
@@ -41,7 +98,7 @@ class Task(object):
     @abstractmethod
     def stop_command(self, update: telegram.Update, context: telegram.ext.CallbackContext) -> None:
         """Stop the task."""
-        
+
         pass
 
     def _start(self, jobs: List[telegram.ext.Job], job_queue: JobQueue, chat_id) -> None:
@@ -63,11 +120,6 @@ class Task(object):
             jobs.pop(idx)
         self.logger.info(
             f' stopped {count} of {num_jobs} jobs for chat_id={chat_id}')
-
-    @abstractmethod
-    def callback(self, context: telegram.ext.CallbackContext) -> None:
-        context.bot.send_message(
-            chat_id=context.job.context, text=f'Callback from {self.job_name}')
 
     def get_inline_keyboard(self) -> List[InlineKeyboardButton]:
         """Returns a List[InlineKeyboardButton] containing all the relevant buttons."""

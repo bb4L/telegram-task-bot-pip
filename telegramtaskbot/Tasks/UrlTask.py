@@ -16,34 +16,45 @@ class UrlTask(GenericTask):
 
     Attributes
     ----------
+    job_name : str
+        the name of the task
+
     disable_notifications : bool
-        wether notifications should be disabled or not
+        bool if notifications should be disabled or not
+
+    url : str
+        the url where the data for the message lies
 
     Methods
     ----------
-    def callback(self, context: telegram.ext.CallbackContext) -> None:
+    callback(self, context: telegram.ext.CallbackContext) -> None
         Execute the task and use the context to send the message.
 
-    def get_actual_value(self, joblist: [], update: telegram.Update, context: telegram.ext.CallbackContext) -> None:
+    get_actual_value(self, joblist: [], update: telegram.Update, context: telegram.ext.CallbackContext) -> None
         Returns the current value for the task.
 
-    # TODO: write docs
-    def get_actual_value_cmd(self, update: telegram.Update, context: telegram.ext.CallbackContext) -> None:
+    get_actual_value_cmd(self, update: telegram.Update, context: telegram.ext.CallbackContext) -> None
+        Called whe tapping on the button to get the actual value
 
-    def handle_get_actual_value(self, context: telegram.ext.CallbackContext, chat_id: str) -> None:
+    handle_get_actual_value(self, context: telegram.ext.CallbackContext, chat_id: str) -> None
+        Writes te actual walue to the given context and chat_id
 
-    def get_data(self) -> str:
+    get_data(self) -> str
+        Returns the data/message text to be send
 
-    def handle_response(self, response: Response) -> str:
+    handle_response(self, response: Response) -> str
+        Handles the response and transforms it into the message text to be send
 
-    def get_response(self) -> Response:
+    get_response(self) -> Response
+        Returns the response for the given url
 
-    def get_inline_keyboard(self) -> List[InlineKeyboardButton]:
+    get_inline_keyboard(self) -> List[InlineKeyboardButton]
+        Returns the list of buttons to be shown
     """
 
+    job_name: str
     disable_notifications = True
     url: str
-    job_name: str
 
     def callback(self, context: telegram.ext.CallbackContext) -> None:
         self.logger.info(f'Run {self.job_name}')
@@ -60,13 +71,19 @@ class UrlTask(GenericTask):
                 self.logger.error(e.message)
 
     def get_actual_value(self, joblist: [], update: telegram.Update, context: telegram.ext.CallbackContext) -> None:
+        """Function for te mapping to send the actual value after button is pressed."""
+
         self.handle_get_actual_value(
             context, update.callback_query.message.chat_id)
 
     def get_actual_value_cmd(self, update: telegram.Update, context: telegram.ext.CallbackContext) -> None:
+        """"Handles command to get the actual value.""""
+
         self.handle_get_actual_value(context, update.message.chat_id)
 
     def handle_get_actual_value(self, context: telegram.ext.CallbackContext, chat_id: str) -> None:
+        """Send the actual value/message with the given context to the chat_id."""
+
         self.logger.debug(
             f'Get actual value from {self.job_name} for {chat_id}')
         data = self.get_data()
@@ -75,6 +92,8 @@ class UrlTask(GenericTask):
         context.bot.send_message(chat_id=chat_id, text=data)
 
     def get_data(self) -> str:
+        """Returns the data to be send as message."""
+
         return self.handle_response(self.get_response())
 
     @abstractmethod
@@ -84,6 +103,8 @@ class UrlTask(GenericTask):
         pass
 
     def get_response(self) -> Response:
+        """Returns the response for the set url."""
+
         count = 0
         response = requests.get(self.url)
         if response.status_code != 200:
