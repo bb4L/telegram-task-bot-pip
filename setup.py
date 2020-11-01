@@ -2,7 +2,7 @@ from setuptools import setup
 
 setup(
     name='telegram-task-bot',
-    version='0.1.2',
+    version='0.1.1.3',
     description='Library for writing task based telegram bots',
     long_description=open('README.md').read(),
     long_description_content_type='text/markdown',

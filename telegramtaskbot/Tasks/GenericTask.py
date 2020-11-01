@@ -57,7 +57,7 @@ class GenericTask(Task):
     def __init__(self, job_queue: JobQueue = None) -> None:
         super().__init__()
         self.job_actual_value = 'actual_' + self.job_name
-        self._handle_start([], job_queue, self.job_name)
+        self._start([], job_queue, self.job_name)
 
     @abstractmethod
     def callback(self, context: telegram.ext.CallbackContext) -> None:
