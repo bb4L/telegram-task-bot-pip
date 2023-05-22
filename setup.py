@@ -15,7 +15,7 @@ setup(
     install_requires=[
         'python-telegram-bot==12.2.0',
         'python-dotenv==0.10.3',
-        'requests==2.22.0',
+        'requests==2.31.0',
     ],
     classifiers=[
         'Development Status :: 4 - Beta',
